@@ -17,5 +17,10 @@ func ConnectToClickHouse() (connect *sql.DB, err error){
 		log.Fatal(err)
 		return nil, err
 	}
+	err = connect.Ping()
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
 	return connect, nil
 }
