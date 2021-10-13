@@ -5,7 +5,6 @@ import (
 	//"github.com/ClickHouse/clickhouse-go"
 	"gorm.io/driver/clickhouse"
 	"gorm.io/gorm"
-	"liquidity_pool_service/model"
 )
 
 const (
@@ -21,19 +20,19 @@ func ConnectToClickHouse() (db *gorm.DB, err error){
 	}
 
 	// Auto Migrate
-	err = db.AutoMigrate(&model.ReservePair{})
-	if err != nil {
-		return nil, err
-	}
-	err = db.AutoMigrate(&model.TokenPair{})
-	if err != nil {
-		return nil, err
-	}
+	//err = db.AutoMigrate(&model.ReservePair{})
+	//if err != nil {
+	//	return nil, err
+	//}
+	//err = db.AutoMigrate(&model.TokenPair{})
+	//if err != nil {
+	//	return nil, err
+	//}
 	// Set table options
-	err = db.Set("gorm:table_options", "ENGINE=Distributed(cluster, default, hits)").AutoMigrate(&model.ReservePair{})
-	if err != nil {
-		return nil, err
-	}
+	//err = db.Set("gorm:table_options", "ENGINE=Distributed(cluster, default, hits)").AutoMigrate(&model.ReservePair{})
+	//if err != nil {
+	//	return nil, err
+	//}
 
 	return db, nil
 }
