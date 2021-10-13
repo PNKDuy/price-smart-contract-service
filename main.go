@@ -1,16 +1,19 @@
 package main
 
-import "liquidity_pool_service/connector"
+import (
+	"liquidity_pool_service/connector"
+	"log"
+)
 
 func main() {
-	connector.ConnectToClickHouse()
-	//_, client, err := models.ConnectToSmartContract(models.UniswapFactoryContractAddress,models.InfuraSecretId)
+	//connector.ConnectToClickHouse()
+	//_, client, err := model.ConnectToSmartContract(model.UniswapFactoryContractAddress,models.InfuraSecretId)
 	//if err != nil {
 	//	log.Fatal(err)
 	//}
-	//contractAddress := common.HexToAddress(models.UniswapFactoryContractAddress)
-	//
-	//models.SubcribingToCreatedPairEvent(contractAddress, client)
+	//contractAddress := common.HexToAddress(model.UniswapFactoryContractAddress)
+
+	//model.SubscribingToCreatedPairEvent(contractAddress, client)
 	//subscribing event log
 	//query := ethereum.FilterQuery{
 	//	Addresses: []common.Address{contractAddress},
@@ -29,7 +32,7 @@ func main() {
 	//		log.Fatal(err)
 	//	case vLog := <-logs:
 	//		evt, err := contractAbi.Unpack("PairCreated", vLog.Data)
-	//		fmt.Println(evt)
+	//		fmt.Println(evt[1])
 	//		//err := json.Unmarshal(vLog.Data, &event)
 	//		if err != nil {
 	//			log.Println("Cannot unmarshal")
@@ -48,7 +51,11 @@ func main() {
 	//for i, _ := range tokenPairList {
 	//	fmt.Println(tokenPairList[i].Token0Symbol + tokenPairList[i].Token0Symbol)
 	//}
-
+	db, err := connector.ConnectToClickHouse()
+	if err != nil {
+		log.Println(err)
+	}
+	println(db.Name())
 
 }
 

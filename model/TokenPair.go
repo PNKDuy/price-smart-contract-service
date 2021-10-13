@@ -1,8 +1,7 @@
-package models
+package model
 
 import (
 	"context"
-	"fmt"
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -35,11 +34,6 @@ type ReservePair struct {
 	Reserve0           *big.Int
 	Reserve1           *big.Int
 	BlockTimestampLast uint32
-}
-
-type CreatedPairEvent struct {
-	PairAddress common.Address
-	AllPairsLength uint
 }
 
 func ConnectToSmartContract(address, clientSecretId string) (factoryMain *factory.Main,client *ethclient.Client, err error) {
@@ -124,29 +118,46 @@ func GetPairReserves(pairMain *pair.Main) (reserves ReservePair, err error) {
 	return reserveJson, err
 }
 
-func SubcribingToCreatedPairEvent(contractAddress common.Address,client *ethclient.Client) {
+func SubscribingToCreatedPairEvent(factoryMain *factory.Main, contractAddress common.Address,client *ethclient.Client)  error{
 	query := ethereum.FilterQuery{
 		Addresses: []common.Address{contractAddress},
 	}
-	var event []interface{}
+
 	logs := make(chan types.Log)
 	sub, err := client.SubscribeFilterLogs(context.Background(), query, logs)
 	if err != nil {
 		log.Fatal(err)
 	}
 	contractAbi, err := abi.JSON(strings.NewReader(factory.MainABI))
+
 	for {
 		select {
 		case err := <-sub.Err():
 			log.Fatal(err)
 		case vLog := <-logs:
-			err := contractAbi.UnpackIntoInterface(&event,"PairCreated", vLog.Data)
-			fmt.Println(event)
+			evt, err := contractAbi.Unpack("PairCreated", vLog.Data)
 			if err != nil {
 				log.Println("Cannot unmarshal")
+				return err
 			}
+
+			evt64 := evt[1].(int64)
+			evt64, ok := evt[1].(int64)
+			if !ok {
+				log.Println("Cannot unmarshal")
+				return err
+			}
+			//err := json.Unmarshal(vLog.Data, &event)
+
+			_, err = GetPairByLength(factoryMain, client, evt64)
+			if err != nil {
+				return err
+			}
+
+
 		}
 	}
+
 }
 
 
